@@ -45,11 +45,14 @@ jobs:
 
       - name: Install pinned dependencies
         if: steps.arduino-cache.outputs.cache-hit != 'true'
+        env:
+          ARDUINO_NETWORK_CONNECTION_TIMEOUT: 180s
         run: |
-          arduino-cli core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
-          arduino-cli core install arduino:avr@1.8.8
-          arduino-cli core install esp8266:esp8266@3.1.2 --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
-          arduino-cli lib install ArduinoJson@6.21.6
+          esp_index='https://github.com/esp8266/Arduino/releases/download/3.1.2/package_esp8266com_index.json'
+          arduino-cli core update-index --additional-urls "$esp_index"
+          arduino-cli core install arduino:avr@1.8.8 --additional-urls "$esp_index"
+          arduino-cli core install esp8266:esp8266@3.1.2 --additional-urls "$esp_index"
+          arduino-cli lib install ArduinoJson@6.21.6 --additional-urls "$esp_index"
 
       - name: Check release tag
         if: startsWith(github.ref, 'refs/tags/')
@@ -68,9 +71,43 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  windows-build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Arduino CLI 1.6.0
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $CliDir = Join-Path $env:RUNNER_TEMP 'arduino-cli'
+          $CliZip = Join-Path $CliDir 'arduino-cli-1.6.0.zip'
+          New-Item -ItemType Directory -Force $CliDir | Out-Null
+          Invoke-WebRequest 'https://github.com/arduino/arduino-cli/releases/download/v1.6.0/arduino-cli_1.6.0_Windows_64bit.zip' -OutFile $CliZip -TimeoutSec 180 -MaximumRetryCount 3 -RetryIntervalSec 2
+          if ((Get-FileHash $CliZip -Algorithm SHA256).Hash -ne '2769b9b282ce597db9679d8ec14d726d57004ca4205ef4d7a795bf36b6cdc9d8') {
+              throw 'Arduino CLI checksum mismatch'
+          }
+          Expand-Archive $CliZip -DestinationPath $CliDir -Force
+          Add-Content -LiteralPath $env:GITHUB_PATH -Value $CliDir -Encoding utf8
+
+      - name: Install dependencies and build both targets in PowerShell
+        shell: pwsh
+        run: pwsh -File ./tools/build.ps1 -Target all -Install
+
+      - name: Upload Windows firmware and checksums
+        uses: actions/upload-artifact@v7
+        with:
+          name: ups-controller-firmware-windows
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, windows-build]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

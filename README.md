@@ -125,10 +125,12 @@ arduino-cli version
 ```powershell
 git clone https://github.com/garik816/ups-controller.git
 cd ups-controller
-pwsh -File .\tools\build.ps1 -Install
+pwsh -File .\tools\build.ps1 -Target esp8266 -Install
 ```
 
-`-Install` завантажує зафіксовані ядра і бібліотеку. Для наступних збирань його можна пропускати:
+**Для першого збирання потрібен `-Install`.** Він встановлює ядро ESP8266 3.1.2 і ArduinoJson 6.21.6, після чого одразу збирає прошивку. Для Nano використовуйте `-Target nano -Install`, для обох плат — `-Target all -Install`.
+
+Після успішного встановлення залежностей `-Install` можна пропускати:
 
 ```powershell
 pwsh -File .\tools\build.ps1 -Target esp8266
@@ -147,6 +149,29 @@ pwsh -File .\tools\build.ps1 -Target nano -NanoProcessor atmega328
 - NodeMCU: `esp8266:esp8266:nodemcuv2:eesz=4M2M,baud=115200` — NodeMCU 1.0 (ESP-12E Module), flash 4 MB, LittleFS 2 MB.
 
 Після збирання каталог `dist` містить файли з версією в назві, `manifest.json` та `SHA256SUMS`. При збиранні однієї цілі `dist` містить тільки цю ціль; попередні згенеровані пакети замінюються.
+
+### Якщо ESP8266 не встановлюється
+
+`Platform 'esp8266:esp8266' not found` означає, що ядро ще не встановлене. Якщо перед цим був `context deadline exceeded` під час завантаження `package_esp8266com_index.json`, установка зупинилася на мережевому запиті. Повторне збирання без `-Install` цього не виправляє.
+
+Оновіть скрипт і повторіть установку з каталогу проєкту:
+
+```powershell
+git pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw 'Git update failed; check its message before continuing.' }
+pwsh -File .\tools\build.ps1 -Target esp8266 -Install
+```
+
+Скрипти використовують індекс з [офіційного GitHub Release ESP8266 3.1.2](https://github.com/esp8266/Arduino/releases/tag/3.1.2), без запиту до `arduino.esp8266.com`. URL передається всім CLI-командам ESP-збирання та має пріоритет над старим URL у конфігурації. Глобальний конфігураційний файл Arduino CLI не змінюється. За потреби адресу можна перевизначити параметром `-EspIndexUrl` у PowerShell або `--esp-index-url` у Bash.
+
+Тайм-аут мережевої бездіяльності для запуску скрипта — **180 секунд**. Власне значення можна задати через `ARDUINO_NETWORK_CONNECTION_TIMEOUT`, наприклад:
+
+```powershell
+$env:ARDUINO_NETWORK_CONNECTION_TIMEOUT = '600s'
+pwsh -File .\tools\build.ps1 -Target esp8266 -Install
+```
+
+Це параметр [Arduino CLI](https://arduino.github.io/arduino-cli/1.6/configuration/), а не загальний час усієї установки. Команда запуску PowerShell — `pwsh`, без крапки перед назвою; `.\` використовується лише перед відносним шляхом скрипта.
 
 ### Прошити через USB
 
@@ -207,7 +232,7 @@ bash tools/build.sh --target nano --nano-processor atmega328old
 
 ### Arduino IDE
 
-1. Встановіть відповідне ядро. Для ESP8266 додайте до Additional Boards Manager URLs: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`.
+1. Встановіть відповідне ядро. Для ESP8266 додайте до Additional Boards Manager URLs: `https://github.com/esp8266/Arduino/releases/download/3.1.2/package_esp8266com_index.json`.
 2. Скопіюйте каталог `libraries/UpsControl` до `libraries` вашого Arduino Sketchbook. Для ESP встановіть ArduinoJson **6.21.6**.
 3. Для ESP після зміни сторінки виконайте `python tools/embed_web.py`. Відкрийте тільки потрібний скетч: `firmware/esp8266/esp8266.ino` або `firmware/arduino_nano/arduino_nano.ino`.
 4. Виберіть NodeMCU 1.0 (ESP-12E Module), Flash Size **4MB (FS:2MB OTA:~1019KB)**; або Nano / відповідний процесор та bootloader.
@@ -221,15 +246,16 @@ bash tools/build.sh --target nano --nano-processor atmega328old
 
 ## GitHub Actions і релізи
 
-Workflow [Build firmware](.github/workflows/firmware.yml) працює на **GitHub-hosted `ubuntu-latest`**:
+Workflow [Build firmware](.github/workflows/firmware.yml) працює на **GitHub-hosted `ubuntu-latest` і `windows-latest`**:
 
 - запускає native-тести автомата та налаштувань;
 - збирає Nano й ESP8266;
 - перевіряє узгодженість версії та формує `.hex`, `.bin`, manifest і SHA-256;
 - зберігає артефакт `ups-controller-firmware` на 30 днів;
+- окремо встановлює залежності та збирає обидві плати на Windows через `tools/build.ps1 -Target all -Install`, з артефактом `ups-controller-firmware-windows`;
 - при push тегу `vX.Y.Z`, який відповідає `VERSION`, публікує файли в GitHub Release після успішної збірки.
 
-Ядра та бібліотеки кешуються між запусками. Файли релізу зберігаються окремо від тимчасових Actions-артефактів.
+На Linux ядра та бібліотеки кешуються між запусками. Windows перевіряє установку без кеша. Реліз чекає обидві збірки й публікує основний Linux-артефакт. Файли релізу зберігаються окремо від тимчасових Actions-артефактів.
 
 При оновленні змінюйте `VERSION`, `UPS_FIRMWARE_VERSION` у `libraries/UpsControl/src/FirmwareVersion.h`, `version` у `libraries/UpsControl/library.properties` та журнал змін разом. Обидві прошивки повинні мати один номер версії.
 
