@@ -1,11 +1,11 @@
-# ESP8266 HTTP API, v1 (firmware 1.1.0)
+# ESP8266 HTTP API, v1 (firmware 1.1.1)
 
 Local HTTP on port 80; same API on AP and router address. UI and API use HTTP Basic authentication (`admin`, default password `1234567890`). GET /api/status returns a per-boot `csrf_token`; every POST uses `X-UPS-Token`. No cross-origin access. JSON bodies only, except the firmware upload. Passwords are never returned by GET endpoints or logs.
 
 ## GET /api/status
 
 ```json
-{"version":"1.1.0","csrf_token":"...","uptime_ms":10000,"free_heap":30000,"reset_reason":"...","storage_ok":true,"ups":{"state":"off","phase":"waiting","result":"none","busy":false,"relay":false,"mains":true,"online":false,"battery":false,"inputs_valid":true,"auto_hold":false,"cycle_handled":false,"attempts":0,"remaining_ms":1000},"network":{"mode":"standalone","ap_active":true,"ap_ssid":"UPS_wifi","ap_ip":"192.168.7.1","ap_clients":1,"sta_connected":false,"sta_ssid":"","sta_ip":"0.0.0.0","rssi":0,"fallback":false,"subnet_conflict":false}}
+{"version":"1.1.1","csrf_token":"...","uptime_ms":10000,"free_heap":30000,"reset_reason":"...","storage_ok":true,"ups":{"state":"off","phase":"waiting","result":"none","busy":false,"relay":false,"mains":true,"online":false,"battery":false,"inputs_valid":true,"auto_hold":false,"cycle_handled":false,"attempts":0,"remaining_ms":1000},"network":{"mode":"standalone","ap_active":true,"ap_ssid":"UPS_wifi","ap_ip":"192.168.7.1","ap_clients":1,"sta_connected":false,"sta_ssid":"","sta_ip":"0.0.0.0","rssi":0,"fallback":false,"subnet_conflict":false}}
 ```
 
 UPS state is `unknown`, `off`, `online`, `battery` or `running`; both indicators active is `running`. Phase and result are humanized in the UI; unmapped values must still be shown safely. Timestamps in logs use monotonic uptime, not a fictional clock.
@@ -51,7 +51,7 @@ Firmware 1.1.0 also returns and accepts:
 {"battery":{"enabled":false,"full_scale_mv":62600,"low_warning_mv":0}}
 ```
 
-`enabled` must be boolean; `full_scale_mv` must be an integer in 10000..80000; `low_warning_mv` is integer zero (off) or 8000..14000. Defaults are off / 62600 / 0. The nominal scale 62600 matches the external 180k/10k divider with the NodeMCU onboard 220k/100k divider; 19000 matches the same external resistors connected to a bare 1 V ADC. Choose the actual hardware and calibrate against a multimeter.
+`enabled` must be boolean; `full_scale_mv` must be an integer in 10000..100000; `low_warning_mv` is integer zero (off) or 8000..14000. Defaults are off / 62600 / 0. The nominal scale 62600 matches the external 180k/10k divider with the NodeMCU onboard 220k/100k divider; 19000 matches the same external resistors connected to a bare 1 V ADC. External 220k/10k uses 75800 with the same NodeMCU onboard divider, or 23000 with a bare 1 V ADC. Choose the actual hardware and calibrate against a multimeter. Firmware 1.1.1 raises the coefficient limit from 80000 to 100000 to accommodate resistor tolerances; the physical battery range remains 0..16 V.
 
 Changing only voltage/network/security settings does not reset UPS filters or autostart timers. Firmware accepts complete stored schema-1 settings from 1.0.x and preserves their UPS/network/password settings with voltage measurement disabled. New saves use schema 2 and require all three battery keys in a stored snapshot. HTTP patches remain partial.
 
@@ -63,7 +63,7 @@ Changing only voltage/network/security settings does not reset UPS filters or au
 
 Enter a simultaneous multimeter reading at a stable battery voltage. Measurement must already be enabled with a valid fresh sample. UPS actions, firmware upload, network changes, scans and pending reboot block calibration with 409. Normal Basic authentication and `X-UPS-Token` are required.
 
-The server accepts integer `reference_mv` 8000..16000 and ADC codes 10..1019, computes `round(reference_mv * 1023 / raw_adc)`, and accepts a resulting `full_scale_mv` in 10000..80000. Invalid inputs return 400. The new coefficient is saved atomically; a storage failure returns 500 and leaves the running coefficient unchanged. Success restarts only ADC averaging, not UPS control, and returns the normal success object. Read GET /api/config to retrieve the saved coefficient.
+The server accepts integer `reference_mv` 8000..16000 and ADC codes 10..1019, computes `round(reference_mv * 1023 / raw_adc)`, and accepts a resulting `full_scale_mv` in 10000..100000. Invalid inputs return 400. The new coefficient is saved atomically; a storage failure returns 500 and leaves the running coefficient unchanged. Success restarts only ADC averaging, not UPS control, and returns the normal success object. Read GET /api/config to retrieve the saved coefficient.
 
 ## POST /api/action
 

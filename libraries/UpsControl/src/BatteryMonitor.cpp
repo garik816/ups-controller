@@ -132,7 +132,7 @@ bool batteryFullScaleFromReference(uint16_t raw, uint32_t reference_mv,
       reference_mv < 8000 || reference_mv > 16000) return false;
   const uint32_t scale = static_cast<uint32_t>(
       (uint64_t(reference_mv) * 1023 + raw / 2) / raw);
-  if (scale < 10000 || scale > 80000) return false;
+  if (scale < 10000 || scale > 100000) return false;
   out_full_scale_mv = scale;
   return true;
 }

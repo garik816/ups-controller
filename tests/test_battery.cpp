@@ -256,10 +256,29 @@ void calibration_matches_nominal_circuits() {
   CHECK(scale == 79844);
 }
 
+void calibration_supports_220k_divider_and_resistor_tolerances() {
+  Rig nodemcu220k(75800);
+  nodemcu220k.window(194);
+  CHECK(nodemcu220k.status().valid);
+  CHECK(nodemcu220k.status().voltage_mv == 14375);
+  uint32_t scale = 0;
+  CHECK(ups::batteryFullScaleFromReference(167, 12374, scale));
+  CHECK(scale == 75800);
+  CHECK(ups::batteryFullScaleFromReference(534, 12006, scale));
+  CHECK(scale == 23000);
+  // With 5% external resistors, a calibrated NodeMCU scale can exceed 80 V.
+  CHECK(ups::batteryFullScaleFromReference(176, 14400, scale));
+  CHECK(scale == 83700);
+  CHECK(ups::batteryFullScaleFromReference(107, 8835, scale));
+  CHECK(scale == 84469);
+  CHECK(ups::batteryFullScaleFromReference(125, 12219, scale));
+  CHECK(scale == 100000);
+}
+
 void calibration_rejects_unsafe_or_unusable_inputs_without_mutation() {
-  const uint16_t raw[] = {0, 9, 1020, 1023, UINT16_MAX, 200, 200, 819, 204, 10};
+  const uint16_t raw[] = {0, 9, 1020, 1023, UINT16_MAX, 200, 200, 819, 163, 10, 85};
   const uint32_t reference[] = {12000, 12000, 12000, 12000, 12000,
-      7999, 16001, 8000, 16000, 8000};
+      7999, 16001, 8000, 16000, 8000, 8309};
   for (unsigned i = 0; i < sizeof(raw) / sizeof(raw[0]); ++i) {
     uint32_t scale = 62600;
     CHECK(!ups::batteryFullScaleFromReference(raw[i], reference[i], scale));
@@ -285,6 +304,7 @@ int main() {
   fresh_rail_sample_overrides_old_average_but_it_also_expires();
   sampling_and_staleness_survive_millis_wrap();
   calibration_matches_nominal_circuits();
+  calibration_supports_220k_divider_and_resistor_tolerances();
   calibration_rejects_unsafe_or_unusable_inputs_without_mutation();
-  std::cout << "18 battery measurement/calibration tests passed\n";
+  std::cout << "19 battery measurement/calibration tests passed\n";
 }

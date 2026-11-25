@@ -159,7 +159,7 @@ void battery_configuration_is_optional_and_strictly_validated() {
   const char *invalid[] = {
     R"({"battery":null})", R"({"battery":[]})",
     R"({"battery":{"enabled":1}})", R"({"battery":{"enabled":"true"}})",
-    R"({"battery":{"full_scale_mv":9999}})", R"({"battery":{"full_scale_mv":80001}})",
+    R"({"battery":{"full_scale_mv":9999}})", R"({"battery":{"full_scale_mv":100001}})",
     R"({"battery":{"full_scale_mv":"62600"}})", R"({"battery":{"full_scale_mv":62600.5}})",
     R"({"battery":{"full_scale_mv":true}})", R"({"battery":{"low_warning_mv":-1}})",
     R"({"battery":{"low_warning_mv":7999}})", R"({"battery":{"low_warning_mv":14001}})",
@@ -175,6 +175,28 @@ void battery_configuration_is_optional_and_strictly_validated() {
   CHECK(config.battery.low_warning_mv == 11500);
   CHECK(apply(R"({"battery":{"low_warning_mv":0}})", config));
   CHECK(config.battery.low_warning_mv == 0 && config.battery.enabled);
+}
+
+void battery_stock_divider_scale_round_trips() {
+  for (uint32_t scale : {75800u, 83700u, 84469u, 100000u}) {
+    LittleFS.reset();
+    Settings settings;
+    DynamicJsonDocument patch(256);
+    JsonObject battery = patch.createNestedObject("battery");
+    battery["enabled"] = true;
+    battery["full_scale_mv"] = scale;
+    String error;
+    CHECK(patchSettings(patch.as<JsonObjectConst>(), settings, error));
+    CHECK(settings.battery.full_scale_mv == scale);
+    SettingsStore store;
+    CHECK(store.begin(settings, error));
+    CHECK(store.save(settings, error));
+    Settings actual;
+    SettingsStore restored;
+    CHECK(restored.begin(actual, error));
+    CHECK(actual.battery.enabled);
+    CHECK(actual.battery.full_scale_mv == scale);
+  }
 }
 
 void schema_one_migration_preserves_ups_and_keeps_measurement_disabled() {
@@ -368,8 +390,9 @@ int main() {
   short_write_does_not_replace_previous_configuration();
   interrupted_final_rename_recovers_previous_backup();
   battery_configuration_is_optional_and_strictly_validated();
+  battery_stock_divider_scale_round_trips();
   schema_one_migration_preserves_ups_and_keeps_measurement_disabled();
   schema_two_requires_complete_battery_settings_and_rejects_unknown_schema();
-  std::cout << "15 settings validation/persistence tests passed\n";
+  std::cout << "16 settings validation/persistence tests passed\n";
   return 0;
 }

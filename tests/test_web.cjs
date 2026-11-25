@@ -28,7 +28,7 @@ async function launchBrowser() {
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     const status = {
-      version: '1.1.0', csrf_token: 'initial-token', uptime_ms: 125000,
+      version: '1.1.1', csrf_token: 'initial-token', uptime_ms: 125000,
       free_heap: 29400, reset_reason: 'Power on', storage_ok: true,
       ups: {
         state: 'off', phase: 'finished', result: 'none', busy: false,
@@ -128,7 +128,7 @@ async function launchBrowser() {
         { ssid: 'Open', rssi: -70, secure: false }
       ] };
       if (pathname === '/api/update') {
-        status.version = '1.1.1'; status.csrf_token = 'after-update'; status.uptime_ms = 500;
+        status.version = '1.1.2'; status.csrf_token = 'after-update'; status.uptime_ms = 500;
       }
       return reply(data);
     });
@@ -198,6 +198,30 @@ async function launchBrowser() {
     await page.locator('#battery_advanced').evaluate(element => { element.open = true; });
     await page.locator('#battery_preset').selectOption('19000');
     assert.equal(await page.locator('#battery_full_scale').inputValue(), '19');
+    for (const [preset, volts] of [['75800', '75.8'], ['23000', '23']]) {
+      await page.locator('#battery_preset').selectOption(preset);
+      assert.equal(await page.locator('#battery_full_scale').inputValue(), volts, '220k profile selects the correct scale');
+      assert.match(await page.locator('#battery_preset option:checked').textContent(), /220 кОм \/ 10 кОм/);
+      await page.locator('#battery_form button[type=submit]').click();
+      await page.waitForFunction(() => !document.querySelector('#battery_form button[type=submit]').disabled);
+      assert.equal(config.battery.full_scale_mv, Number(preset));
+      assert.equal(await page.locator('#battery_preset').inputValue(), preset, 'Saved stock profile survives config refresh');
+    }
+    await page.locator('#battery_full_scale').fill('87.125');
+    assert.equal(await page.locator('#battery_preset').inputValue(), 'custom');
+    await page.locator('#battery_form button[type=submit]').click();
+    await page.waitForFunction(() => !document.querySelector('#battery_form button[type=submit]').disabled);
+    assert.equal(config.battery.full_scale_mv, 87125, 'Custom calibration above 80 V is accepted');
+    assert.equal(await page.locator('#battery_full_scale').inputValue(), '87.125', 'Config refresh preserves calibrated value');
+    assert.equal(await page.locator('#battery_preset').inputValue(), 'custom');
+    await page.locator('#battery_full_scale').fill('100');
+    await page.locator('#battery_form button[type=submit]').click();
+    await page.waitForFunction(() => !document.querySelector('#battery_form button[type=submit]').disabled);
+    assert.equal(config.battery.full_scale_mv, 100000, '100 V scale is the inclusive upper limit');
+    const beforeInvalidScale = writes.length;
+    await page.locator('#battery_full_scale').fill('100.001');
+    await page.locator('#battery_form button[type=submit]').click();
+    assert.equal(writes.length, beforeInvalidScale, 'Scale above 100 V is not posted');
     await page.locator('#battery_preset').selectOption('62600');
     assert.equal(await page.locator('#battery_full_scale').inputValue(), '62.6');
     await page.locator('#battery_full_scale').fill('63.1');
@@ -322,9 +346,9 @@ async function launchBrowser() {
     await page.waitForFunction(() => document.querySelector('#feedback_text').textContent === 'Перевірка прошивки не пройдена');
     assert.equal(uploadReceived, true);
     assert.equal(await page.locator('#firmware_file').isDisabled(), false);
-    assert.equal(status.version, '1.1.0');
+    assert.equal(status.version, '1.1.1');
     await page.locator('#update_form button[type=submit]').click();
-    await page.waitForFunction(() => document.querySelector('#firmware_version').textContent === '1.1.1');
+    await page.waitForFunction(() => document.querySelector('#firmware_version').textContent === '1.1.2');
     await page.waitForFunction(() => document.querySelector('#feedback_text').textContent.includes('знову на зв’язку'));
 
     await page.locator('#tab_automation').click();

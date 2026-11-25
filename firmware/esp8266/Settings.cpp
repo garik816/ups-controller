@@ -166,7 +166,7 @@ bool patchSettings(JsonObjectConst root, Settings &s, String &error) {
       !readBoolean(inputs, "standby_active_high", s.standby_active_high, error)) return false;
   JsonObjectConst battery = root["battery"];
   if (!readBoolean(battery, "enabled", s.battery.enabled, error) ||
-      !number(battery, "full_scale_mv", s.battery.full_scale_mv, 10000, 80000, error) ||
+      !number(battery, "full_scale_mv", s.battery.full_scale_mv, 10000, 100000, error) ||
       !number(battery, "low_warning_mv", s.battery.low_warning_mv, 0, 14000, error)) return false;
   if (s.battery.low_warning_mv && s.battery.low_warning_mv < 8000) {
     return fail(error, "battery.low_warning_mv (0 or 8000..14000)");
