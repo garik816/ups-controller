@@ -1,0 +1,9 @@
+build/
+dist/
+.cache/
+.arduino/
+__pycache__/
+*.pyc
+node_modules/
+config.local.*
+*.log

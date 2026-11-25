@@ -1,0 +1,111 @@
+name: Build firmware
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firmware-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Arduino CLI 1.6.0
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/arduino-cli"
+          curl --fail --location --retry 3 \
+            'https://github.com/arduino/arduino-cli/releases/download/v1.6.0/arduino-cli_1.6.0_Linux_64bit.tar.gz' \
+            --output "$RUNNER_TEMP/arduino-cli/cli.tar.gz"
+          printf '%s  %s\n' '321ee249f44c78053234fec0f36101092bc6021bf24939e15e0cc2449c5ed250' "$RUNNER_TEMP/arduino-cli/cli.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/arduino-cli/cli.tar.gz" -C "$RUNNER_TEMP/arduino-cli" arduino-cli
+          echo "$RUNNER_TEMP/arduino-cli" >> "$GITHUB_PATH"
+
+      - name: Cache Arduino cores and libraries
+        id: arduino-cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.arduino15
+            ~/Arduino/libraries
+          key: ${{ runner.os }}-arduino-cli1.6.0-avr1.8.8-esp3.1.2-json6.21.6-v1
+
+      - name: Install pinned dependencies
+        if: steps.arduino-cache.outputs.cache-hit != 'true'
+        run: |
+          arduino-cli core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli core install arduino:avr@1.8.8
+          arduino-cli core install esp8266:esp8266@3.1.2 --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli lib install ArduinoJson@6.21.6
+
+      - name: Check release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: test "$RELEASE_TAG" = "v$(tr -d '\r\n' < VERSION)"
+
+      - name: Test and build both targets
+        run: bash tools/build.sh --target all --test
+
+      - name: Upload firmware and checksums
+        uses: actions/upload-artifact@v7
+        with:
+          name: ups-controller-firmware
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified build
+        uses: actions/download-artifact@v8
+        with:
+          name: ups-controller-firmware
+          path: dist
+
+      - name: Verify artifact checksums
+        working-directory: dist
+        run: sha256sum --check SHA256SUMS
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
+          Прошивки UPS Controller для Arduino Nano та NodeMCU v3 (ESP8266).
+
+          - Arduino Nano: файл `.hex`; для завантаження через USB використовуйте відповідний old/new bootloader.
+          - NodeMCU v3: файл `.bin`, 4 MB flash, FS 2 MB; вебінтерфейс включено у прошивку.
+          - Перший запуск ESP: `UPS_wifi`, пароль `1234567890`, `http://192.168.7.1`, вхід `admin` / `1234567890`.
+          - `manifest.json` містить версію, commit, цільову плату й SHA-256; `SHA256SUMS` перевіряє всі файли.
+
+          Налаштування входів та тривалості кнопки потрібно перевірити на конкретному UPS перед підключенням навантаження. Інструкції підключення й прошивання — у README репозиторію.
+          NOTES
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/* --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/* --verify-tag \
+              --title "UPS Controller $RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi
