@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <UpsController.h>
+#include <BatteryMonitor.h>
 
 enum class NetworkMode : uint8_t { Standalone, Router, Both };
 
@@ -13,6 +14,7 @@ struct Settings {
   char admin_password[64] = "1234567890";
   uint16_t fallback_seconds = 30;
   ups::Config control;
+  ups::BatteryConfig battery;
   bool online_active_high = true;
   bool battery_active_high = true;
   bool standby_active_high = true;

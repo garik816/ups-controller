@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <Ticker.h>
 #include <UpsController.h>
+#include <BatteryMonitor.h>
 #include "NetworkManager.h"
 #include "Settings.h"
 
@@ -29,6 +30,7 @@ private:
   SettingsStore store_;
   NetworkManager network_;
   ups::Controller controller_;
+  ups::BatteryMonitor battery_monitor_;
   ESP8266WebServer server_{80};
   Ticker relay_timer_;
   LogEntry logs_[LogCapacity] = {};
@@ -52,10 +54,13 @@ private:
   char serial_line_[32] = {};
   uint8_t serial_length_ = 0;
   bool serial_overflow_ = false;
+  bool battery_low_ = false;
+  bool battery_overrange_ = false;
 
   void routes();
   void serialCommands();
   void updateController();
+  void updateBattery();
   void setRelayFromController();
   void log(const char *level, const char *message);
   static void coreEvent(void *context, ups::Event event);
@@ -70,6 +75,7 @@ private:
   void sendStatus();
   void sendConfig();
   void saveConfig();
+  void calibrateBattery();
   void sendLogs();
   void action();
   void uploadChunk();

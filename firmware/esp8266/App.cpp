@@ -65,6 +65,27 @@ bool sameNetwork(const Settings &a, const Settings &b) {
   return a.network_mode == b.network_mode && !strcmp(a.ssid, b.ssid) &&
       !strcmp(a.wifi_password, b.wifi_password) && a.fallback_seconds == b.fallback_seconds;
 }
+
+bool sameControl(const Settings &a, const Settings &b) {
+#define SAME_CONTROL(name) if (a.control.name != b.control.name) return false
+  SAME_CONTROL(auto_mode);
+  SAME_CONTROL(start_delay_ms);
+  SAME_CONTROL(press_ms);
+  SAME_CONTROL(stop_press_ms);
+  SAME_CONTROL(verify_timeout_ms);
+  SAME_CONTROL(standby_filter_ms);
+  SAME_CONTROL(indicator_filter_ms);
+  SAME_CONTROL(off_confirm_ms);
+  SAME_CONTROL(restart_delay_ms);
+  SAME_CONTROL(retry_delay_ms);
+  SAME_CONTROL(max_attempts);
+  SAME_CONTROL(auto_on_boot);
+  SAME_CONTROL(allow_battery_start);
+#undef SAME_CONTROL
+  return a.online_active_high == b.online_active_high &&
+      a.battery_active_high == b.battery_active_high &&
+      a.standby_active_high == b.standby_active_high;
+}
 }
 
 void App::setup() {
@@ -82,6 +103,7 @@ void App::setup() {
   String storageMessage;
   store_.begin(settings_, storageMessage);
   log(store_.healthy() ? "info" : "error", storageMessage.c_str());
+  battery_monitor_.begin(settings_.battery, millis());
   ups::Latch retained;
   const bool restored = restoreRtc(retained);
   controller_.begin(settings_.control, millis(), restored ? &retained : nullptr);
@@ -97,6 +119,7 @@ void App::setup() {
 
 void App::loop() {
   updateController();
+  updateBattery();
   uint32_t now = millis();
   if (reboot_pending_ && uint32_t(now - reboot_requested_at_) >= 1500) {
     digitalWrite(board::RelayPin, board::RelayOff);
@@ -136,6 +159,10 @@ void App::serialCommands() {
       Serial.printf("UPS %s phase=%s mains=%u online=%u battery=%u relay=%u\n", ups::stateName(s.state), ups::phaseName(s.phase), s.mains, s.online, s.battery, s.relay);
       Serial.print(F("AP: http://192.168.7.1; router: "));
       Serial.println(WiFi.localIP());
+      const ups::BatterySnapshot battery = battery_monitor_.snapshot(millis());
+      Serial.printf("Battery voltage: %s raw=%u", ups::batteryStateName(battery.state), battery.raw_adc);
+      if (battery.valid) Serial.printf(" mV=%lu low=%u", static_cast<unsigned long>(battery.voltage_mv), battery.low);
+      Serial.println();
     } else if (!strcmp(serial_line_, "network-reset")) {
       if (controller_.busy() || uploading_ || reboot_pending_ || network_.scanning()) {
         Serial.println(F("ERR busy; retry after UPS operation")); continue;
@@ -165,6 +192,30 @@ void App::updateController() {
   // Persist the attempt ledger before an actual relay edge is emitted.
   persistRtc();
   setRelayFromController();
+}
+
+void App::updateBattery() {
+  if (uploading_) return;
+  const uint32_t now = millis();
+  if (battery_monitor_.sampleDue(now)) {
+    battery_monitor_.sample(static_cast<uint16_t>(analogRead(A0)), now);
+  }
+  const ups::BatterySnapshot battery = battery_monitor_.snapshot(now);
+  if (!battery.enabled) {
+    battery_low_ = false;
+    battery_overrange_ = false;
+    return;
+  }
+  if (battery.saturated && !battery_overrange_) {
+    log("warning", "АЦП батареї перевантажено; перевірте дільник напруги");
+  }
+  battery_overrange_ = battery.saturated;
+  if (battery.valid && battery.low != battery_low_) {
+    log(battery.low ? "warning" : "info", battery.low
+        ? "Напруга батареї нижча за заданий поріг"
+        : "Напруга батареї відновилася вище порога");
+    battery_low_ = battery.low;
+  }
 }
 
 void App::setRelayFromController() {
@@ -278,7 +329,7 @@ void App::error(int status, const char *message) {
 
 void App::sendStatus() {
   if (!authenticate()) return;
-  DynamicJsonDocument document(2048);
+  DynamicJsonDocument document(3072);
   document["version"] = UPS_FIRMWARE_VERSION;
   document["csrf_token"] = csrf_token_;
   document["uptime_ms"] = millis();
@@ -302,6 +353,23 @@ void App::sendStatus() {
   state["cycle_handled"] = s.cycle_handled;
   state["attempts"] = s.attempts;
   state["remaining_ms"] = s.remaining_ms;
+  const ups::BatterySnapshot reading = battery_monitor_.snapshot(millis());
+  JsonObject battery = document.createNestedObject("battery");
+  battery["enabled"] = reading.enabled;
+  battery["valid"] = reading.valid;
+  battery["state"] = ups::batteryStateName(reading.state);
+  battery["low"] = reading.valid && reading.low;
+  battery["saturated"] = reading.saturated;
+  battery["full_scale_mv"] = settings_.battery.full_scale_mv;
+  battery["low_warning_mv"] = settings_.battery.low_warning_mv;
+  const char *readingState = ups::batteryStateName(reading.state);
+  if (reading.enabled && strcmp(readingState, "warming_up") && strcmp(readingState, "stale")) {
+    battery["raw_adc"] = reading.raw_adc;
+  } else {
+    battery["raw_adc"] = nullptr;
+  }
+  if (reading.valid) battery["voltage_mv"] = reading.voltage_mv;
+  else battery["voltage_mv"] = nullptr;
   network_.status(document.createNestedObject("network"));
   sendJson(document);
 }
@@ -332,8 +400,18 @@ void App::saveConfig() {
   if (!store_.save(candidate, problem)) { error(500, problem.c_str()); return; }
   const bool networkChanged = !sameNetwork(settings_, candidate) || network_.hasConflict();
   const bool passwordChanged = strcmp(settings_.admin_password, candidate.admin_password) != 0;
-  controller_.configure(candidate.control, millis());
+  const bool controlChanged = !sameControl(settings_, candidate);
+  const bool batteryChanged = settings_.battery.enabled != candidate.battery.enabled ||
+      settings_.battery.full_scale_mv != candidate.battery.full_scale_mv ||
+      settings_.battery.low_warning_mv != candidate.battery.low_warning_mv;
+  // Voltage/network-only edits must not restart UPS debounce or autostart timers.
+  if (controlChanged) controller_.configure(candidate.control, millis());
   settings_ = candidate;
+  if (batteryChanged) {
+    battery_monitor_.configure(settings_.battery, millis());
+    battery_low_ = false;
+    battery_overrange_ = false;
+  }
   persistRtc();
   if (networkChanged) {
     network_pending_ = true;
@@ -343,6 +421,33 @@ void App::saveConfig() {
   success(passwordChanged ? "Збережено. Для наступного запиту введіть новий пароль admin"
                          : networkChanged ? "Збережено. Мережеві налаштування застосовуються"
                                           : "Налаштування збережено");
+}
+
+void App::calibrateBattery() {
+  if (!authenticate(true) || !idleForMaintenance()) return;
+  DynamicJsonDocument document(256);
+  if (!jsonBody(document)) return;
+  if (!document["reference_mv"].is<uint32_t>() || document["reference_mv"].is<bool>()) {
+    error(400, "Введіть вимір мультиметра в мілівольтах (8000..16000)"); return;
+  }
+  const ups::BatterySnapshot reading = battery_monitor_.snapshot(millis());
+  if (!reading.enabled || !reading.valid || reading.saturated) {
+    error(409, "Увімкніть вимірювання та дочекайтеся придатного показу АЦП"); return;
+  }
+  uint32_t scale = 0;
+  if (!ups::batteryFullScaleFromReference(reading.raw_adc, document["reference_mv"].as<uint32_t>(), scale)) {
+    error(400, "Не вдалося калібрувати: перевірте вимір мультиметра, дільник і показ АЦП"); return;
+  }
+  Settings candidate = settings_;
+  candidate.battery.full_scale_mv = scale;
+  String problem;
+  if (!store_.save(candidate, problem)) { error(500, problem.c_str()); return; }
+  settings_ = candidate;
+  battery_monitor_.configure(settings_.battery, millis());
+  battery_low_ = false;
+  battery_overrange_ = false;
+  log("info", "Вимірювання батареї відкалібровано за мультиметром");
+  success("Калібрування збережено. Оновлений показ з'явиться після усереднення");
 }
 
 void App::sendLogs() {
@@ -399,6 +504,7 @@ void App::routes() {
   server_.on("/api/status", HTTP_GET, [this]() { sendStatus(); });
   server_.on("/api/config", HTTP_GET, [this]() { sendConfig(); });
   server_.on("/api/config", HTTP_POST, [this]() { saveConfig(); });
+  server_.on("/api/battery/calibrate", HTTP_POST, [this]() { calibrateBattery(); });
   server_.on("/api/action", HTTP_POST, [this]() { action(); });
   server_.on("/api/logs", HTTP_GET, [this]() { sendLogs(); });
   server_.on("/api/scan", HTTP_POST, [this]() {

@@ -1,14 +1,31 @@
 #include <Arduino.h>
 #include <FirmwareVersion.h>
 #include <UpsController.h>
+#include <BatteryMonitor.h>
 #include "BoardConfig.h"
 
 ups::Controller controller;
+ups::BatteryMonitor batteryMonitor;
 
 void eventLog(void *, ups::Event event) {
   Serial.print(millis());
   Serial.print(F(" UPS: "));
   Serial.println(ups::eventName(event));
+}
+
+void printBattery() {
+  const ups::BatterySnapshot battery = batteryMonitor.snapshot(millis());
+  Serial.print(F("Battery state="));
+  Serial.print(ups::batteryStateName(battery.state));
+  Serial.print(F(" raw="));
+  Serial.print(battery.raw_adc);
+  if (battery.valid) {
+    Serial.print(F(" mV="));
+    Serial.print(battery.voltage_mv);
+    Serial.print(F(" low="));
+    Serial.print(battery.low);
+  }
+  Serial.println();
 }
 
 void printStatus() {
@@ -29,6 +46,7 @@ void printStatus() {
   Serial.print(s.auto_hold);
   Serial.print(F(" attempts="));
   Serial.println(s.attempts);
+  printBattery();
 }
 
 void setup() {
@@ -45,7 +63,12 @@ void setup() {
   // Both variants use the same defaults and state machine. To reproduce the
   // legacy 300-ms OFF check, set off_confirm_ms to 300 (less blink immunity).
   controller.begin(config, millis());
-  Serial.println(F("Commands: ? status; s start; o stop; r restart; c cancel; a resume"));
+  ups::BatteryConfig batteryConfig;
+  batteryConfig.enabled = BATTERY_MEASUREMENT_ENABLED;
+  batteryConfig.full_scale_mv = BATTERY_FULL_SCALE_MV;
+  batteryConfig.low_warning_mv = BATTERY_LOW_WARNING_MV;
+  batteryMonitor.begin(batteryConfig, millis());
+  Serial.println(F("Commands: ? status; v battery; s start; o stop; r restart; c cancel; a resume"));
 }
 
 void loop() {
@@ -55,12 +78,16 @@ void loop() {
       (digitalRead(ONLINE_PIN) == HIGH) == ONLINE_ACTIVE_HIGH,
       (digitalRead(BATTERY_PIN) == HIGH) == BATTERY_ACTIVE_HIGH);
   digitalWrite(RELAY_PIN, controller.relayActive() ? RELAY_ON : RELAY_OFF);
+  if (batteryMonitor.sampleDue(now)) {
+    batteryMonitor.sample(static_cast<uint16_t>(analogRead(BATTERY_ADC_PIN)), now);
+  }
   if (!Serial.available()) return;
   const char input = static_cast<char>(Serial.read());
   ups::Command action = ups::Command::Cancel;
   bool recognized = true;
   switch (input) {
     case '?': printStatus(); return;
+    case 'v': printBattery(); return;
     case 's': action = ups::Command::Start; break;
     case 'o': action = ups::Command::Stop; break;
     case 'r': action = ups::Command::Restart; break;

@@ -23,14 +23,14 @@ bool apply(const char *json, Settings &settings) {
 
 Settings customized() {
   Settings settings;
-  CHECK(apply(R"({"network":{"mode":"both","ssid":"UPS test router","password":"router-secret-834","fallback_seconds":45},"security":{"password":"admin-secret-627"},"ups":{"auto_mode":"keep_on","max_attempts":3,"start_delay_ms":22000,"auto_on_boot":false},"inputs":{"battery_active_high":false}})", settings));
+  CHECK(apply(R"({"network":{"mode":"both","ssid":"UPS test router","password":"router-secret-834","fallback_seconds":45},"security":{"password":"admin-secret-627"},"ups":{"auto_mode":"keep_on","max_attempts":3,"start_delay_ms":22000,"auto_on_boot":false},"inputs":{"battery_active_high":false},"battery":{"enabled":true,"full_scale_mv":63500,"low_warning_mv":11500}})", settings));
   return settings;
 }
 
 std::string snapshotJson(const Settings &settings) {
   DynamicJsonDocument document(4096);
   settingsToJson(settings, document.to<JsonObject>(), true);
-  document["schema"] = 1;
+  document["schema"] = 2;
   std::string output;
   serializeJson(document, output);
   return output;
@@ -146,6 +146,99 @@ void valid_snapshot_round_trips_through_actual_store() {
   CHECK(actual.control.start_delay_ms == expected.control.start_delay_ms);
   CHECK(!actual.control.auto_on_boot);
   CHECK(!actual.battery_active_high);
+  CHECK(actual.battery.enabled);
+  CHECK(actual.battery.full_scale_mv == expected.battery.full_scale_mv);
+  CHECK(actual.battery.low_warning_mv == expected.battery.low_warning_mv);
+}
+
+void battery_configuration_is_optional_and_strictly_validated() {
+  Settings config;
+  CHECK(!config.battery.enabled);
+  CHECK(config.battery.full_scale_mv == 62600);
+  CHECK(config.battery.low_warning_mv == 0);
+  const char *invalid[] = {
+    R"({"battery":null})", R"({"battery":[]})",
+    R"({"battery":{"enabled":1}})", R"({"battery":{"enabled":"true"}})",
+    R"({"battery":{"full_scale_mv":9999}})", R"({"battery":{"full_scale_mv":80001}})",
+    R"({"battery":{"full_scale_mv":"62600"}})", R"({"battery":{"full_scale_mv":62600.5}})",
+    R"({"battery":{"full_scale_mv":true}})", R"({"battery":{"low_warning_mv":-1}})",
+    R"({"battery":{"low_warning_mv":7999}})", R"({"battery":{"low_warning_mv":14001}})",
+    R"({"battery":{"low_warning_mv":false}})"
+  };
+  for (const char *json : invalid) {
+    Settings candidate;
+    CHECK(!apply(json, candidate));
+  }
+  CHECK(apply(R"({"battery":{"enabled":true,"full_scale_mv":19000,"low_warning_mv":11500}})", config));
+  CHECK(apply(R"({"network":{"fallback_seconds":40}})", config));
+  CHECK(config.battery.enabled && config.battery.full_scale_mv == 19000);
+  CHECK(config.battery.low_warning_mv == 11500);
+  CHECK(apply(R"({"battery":{"low_warning_mv":0}})", config));
+  CHECK(config.battery.low_warning_mv == 0 && config.battery.enabled);
+}
+
+void schema_one_migration_preserves_ups_and_keeps_measurement_disabled() {
+  LittleFS.reset();
+  const Settings previous = customized();
+  DynamicJsonDocument legacy(4096);
+  CHECK(!deserializeJson(legacy, snapshotJson(previous)));
+  legacy["schema"] = 1;
+  legacy.remove("battery");
+  std::string serialized;
+  serializeJson(legacy, serialized);
+  LittleFS.seed("/config.json", serialized);
+  Settings actual;
+  SettingsStore store;
+  String message;
+  CHECK(store.begin(actual, message));
+  CHECK(store.healthy());
+  CHECK(actual.control.auto_mode == previous.control.auto_mode);
+  CHECK(actual.control.start_delay_ms == previous.control.start_delay_ms);
+  CHECK(std::string(actual.ssid) == previous.ssid);
+  CHECK(std::string(actual.admin_password) == previous.admin_password);
+  CHECK(!actual.battery.enabled);
+  CHECK(actual.battery.full_scale_mv == 62600 && actual.battery.low_warning_mv == 0);
+  CHECK(store.save(actual, message));
+  DynamicJsonDocument saved(4096);
+  CHECK(!deserializeJson(saved, LittleFS.contents("/config.json")));
+  CHECK(saved["schema"].as<unsigned>() == 2);
+  CHECK(saved["battery"].containsKey("full_scale_mv"));
+  CHECK(!saved["battery"]["enabled"].as<bool>());
+}
+
+void schema_two_requires_complete_battery_settings_and_rejects_unknown_schema() {
+  const char *keys[] = {"enabled", "full_scale_mv", "low_warning_mv"};
+  for (const char *key : keys) {
+    LittleFS.reset();
+    const Settings previous = customized();
+    DynamicJsonDocument incomplete(4096);
+    CHECK(!deserializeJson(incomplete, snapshotJson(previous)));
+    incomplete["battery"].remove(key);
+    std::string broken;
+    serializeJson(incomplete, broken);
+    LittleFS.seed("/config.json", broken);
+    LittleFS.seed("/config.bak", snapshotJson(previous));
+    Settings actual;
+    SettingsStore store;
+    String message;
+    CHECK(store.begin(actual, message));
+    CHECK(actual.battery.enabled && actual.battery.full_scale_mv == previous.battery.full_scale_mv);
+  }
+  for (unsigned schema : {0u, 3u}) {
+    LittleFS.reset();
+    DynamicJsonDocument unknown(4096);
+    CHECK(!deserializeJson(unknown, snapshotJson(customized())));
+    unknown["schema"] = schema;
+    std::string broken;
+    serializeJson(unknown, broken);
+    LittleFS.seed("/config.json", broken);
+    Settings actual;
+    SettingsStore store;
+    String message;
+    CHECK(!store.begin(actual, message));
+    CHECK(actual.control.auto_mode == ups::AutoMode::Disabled);
+    CHECK(!actual.battery.enabled);
+  }
 }
 
 void corrupt_primary_uses_previous_complete_backup() {
@@ -274,6 +367,9 @@ int main() {
   mount_failure_disables_control_and_refuses_save();
   short_write_does_not_replace_previous_configuration();
   interrupted_final_rename_recovers_previous_backup();
-  std::cout << "12 settings validation/persistence tests passed\n";
+  battery_configuration_is_optional_and_strictly_validated();
+  schema_one_migration_preserves_ups_and_keeps_measurement_disabled();
+  schema_two_requires_complete_battery_settings_and_rejects_unknown_schema();
+  std::cout << "15 settings validation/persistence tests passed\n";
   return 0;
 }

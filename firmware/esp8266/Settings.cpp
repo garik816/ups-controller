@@ -50,15 +50,17 @@ bool hasKeys(JsonObjectConst object, const char *const (&keys)[N]) {
   return true;
 }
 
-bool completeSnapshot(JsonObjectConst root) {
+bool completeSnapshot(JsonObjectConst root, uint32_t schema) {
   const char *const networkKeys[] = {"mode", "ssid", "password", "fallback_seconds"};
   const char *const controlKeys[] = {"auto_mode", "start_delay_ms", "press_ms", "stop_press_ms",
       "verify_timeout_ms", "standby_filter_ms", "indicator_filter_ms", "off_confirm_ms",
       "restart_delay_ms", "retry_delay_ms", "max_attempts", "auto_on_boot", "allow_battery_start"};
   const char *const inputKeys[] = {"online_active_high", "battery_active_high", "standby_active_high"};
   const char *const securityKeys[] = {"password"};
+  const char *const batteryKeys[] = {"enabled", "full_scale_mv", "low_warning_mv"};
   return hasKeys(root["network"], networkKeys) && hasKeys(root["ups"], controlKeys) &&
-      hasKeys(root["inputs"], inputKeys) && hasKeys(root["security"], securityKeys);
+      hasKeys(root["inputs"], inputKeys) && hasKeys(root["security"], securityKeys) &&
+      (schema == 1 || hasKeys(root["battery"], batteryKeys));
 }
 }
 
@@ -99,6 +101,10 @@ void settingsToJson(const Settings &s, JsonObject root, bool secrets) {
   inputs["online_active_high"] = s.online_active_high;
   inputs["battery_active_high"] = s.battery_active_high;
   inputs["standby_active_high"] = s.standby_active_high;
+  JsonObject battery = root.createNestedObject("battery");
+  battery["enabled"] = s.battery.enabled;
+  battery["full_scale_mv"] = s.battery.full_scale_mv;
+  battery["low_warning_mv"] = s.battery.low_warning_mv;
   JsonObject security = root.createNestedObject("security");
   security["username"] = board::Username;
   if (secrets) security["password"] = s.admin_password;
@@ -107,7 +113,8 @@ void settingsToJson(const Settings &s, JsonObject root, bool secrets) {
 bool patchSettings(JsonObjectConst root, Settings &s, String &error) {
   if (root.isNull()) return fail(error, "JSON object");
   if (!objectType(root, "network", error) || !objectType(root, "ups", error) ||
-      !objectType(root, "inputs", error) || !objectType(root, "security", error)) return false;
+      !objectType(root, "inputs", error) || !objectType(root, "security", error) ||
+      !objectType(root, "battery", error)) return false;
   JsonObjectConst net = root["network"];
   if (net.containsKey("mode")) {
     const char *mode = net["mode"].as<const char *>();
@@ -157,6 +164,13 @@ bool patchSettings(JsonObjectConst root, Settings &s, String &error) {
   if (!readBoolean(inputs, "online_active_high", s.online_active_high, error) ||
       !readBoolean(inputs, "battery_active_high", s.battery_active_high, error) ||
       !readBoolean(inputs, "standby_active_high", s.standby_active_high, error)) return false;
+  JsonObjectConst battery = root["battery"];
+  if (!readBoolean(battery, "enabled", s.battery.enabled, error) ||
+      !number(battery, "full_scale_mv", s.battery.full_scale_mv, 10000, 80000, error) ||
+      !number(battery, "low_warning_mv", s.battery.low_warning_mv, 0, 14000, error)) return false;
+  if (s.battery.low_warning_mv && s.battery.low_warning_mv < 8000) {
+    return fail(error, "battery.low_warning_mv (0 or 8000..14000)");
+  }
   if (!copyText(root["security"], "password", s.admin_password, sizeof(s.admin_password), error)) return false;
   if (strlen(s.admin_password) < 8) return fail(error, "security.password (8..63 bytes)");
   return true;
@@ -168,11 +182,14 @@ bool SettingsStore::readFile(const char *path, Settings &settings) {
   DynamicJsonDocument document(4096);
   DeserializationError parsed = deserializeJson(document, file);
   file.close();
-  if (parsed || !document["schema"].is<uint32_t>() || document["schema"].as<uint32_t>() != 1 ||
-      !completeSnapshot(document.as<JsonObjectConst>())) return false;
+  if (parsed || !document["schema"].is<uint32_t>() || document["schema"].is<bool>()) return false;
+  const uint32_t schema = document["schema"].as<uint32_t>();
+  if ((schema != 1 && schema != 2) || !completeSnapshot(document.as<JsonObjectConst>(), schema)) return false;
   Settings candidate;
   String error;
   if (!patchSettings(document.as<JsonObjectConst>(), candidate, error)) return false;
+  // Firmware 1.0.x had no voltage input. Preserve all its settings, leave A0 off.
+  if (schema == 1) candidate.battery = ups::BatteryConfig();
   settings = candidate;
   return true;
 }
@@ -208,7 +225,7 @@ bool SettingsStore::save(const Settings &settings, String &error) {
   if (!mounted_) { error = F("Сховище недоступне"); return false; }
   DynamicJsonDocument document(4096);
   settingsToJson(settings, document.to<JsonObject>(), true);
-  document["schema"] = 1;
+  document["schema"] = 2;
   if (document.overflowed()) { error = F("Налаштування завеликі"); return false; }
   File file = LittleFS.open("/config.tmp", "w");
   if (!file) { error = F("Не вдалося відкрити файл налаштувань"); return false; }

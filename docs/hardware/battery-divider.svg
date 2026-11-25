@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1008pt" height="856.8pt" viewBox="0 0 1008 856.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 856.8
+L 1008 856.8
+L 1008 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 38.88 100.8
+L 969.12 100.8
+Q 979.2 100.8 979.2 110.88
+L 979.2 429.12
+Q 979.2 439.2 969.12 439.2
+L 38.88 439.2
+Q 28.8 439.2 28.8 429.12
+L 28.8 110.88
+Q 28.8 100.8 38.88 100.8
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #f3f7f9; stroke: #d3e0e6; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 61.2 212.4
+C 62.154731 212.4 63.070488 212.779319 63.745584 213.454416
+C 64.420681 214.129512 64.8 215.045269 64.8 216
+C 64.8 216.954731 64.420681 217.870488 63.745584 218.545584
+C 63.070488 219.220681 62.154731 219.6 61.2 219.6
+C 60.245269 219.6 59.329512 219.220681 58.654416 218.545584
+C 57.979319 217.870488 57.6 216.954731 57.6 216
+C 57.6 215.045269 57.979319 214.129512 58.654416 213.454416
+C 59.329512 212.779319 60.245269 212.4 61.2 212.4
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 162 207.36
+L 226.8 207.36
+L 226.8 224.64
+L 162 224.64
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 295.2 212.832
+C 296.040163 212.832 296.846029 213.1658 297.440114 213.759886
+C 298.0342 214.353971 298.368 215.159837 298.368 216
+C 298.368 216.840163 298.0342 217.646029 297.440114 218.240114
+C 296.846029 218.8342 296.040163 219.168 295.2 219.168
+C 294.359837 219.168 293.553971 218.8342 292.959886 218.240114
+C 292.3658 217.646029 292.032 216.840163 292.032 216
+C 292.032 215.159837 292.3658 214.353971 292.959886 213.759886
+C 293.553971 213.1658 294.359837 212.832 295.2 212.832
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 406.8 212.832
+C 407.640163 212.832 408.446029 213.1658 409.040114 213.759886
+C 409.6342 214.353971 409.968 215.159837 409.968 216
+C 409.968 216.840163 409.6342 217.646029 409.040114 218.240114
+C 408.446029 218.8342 407.640163 219.168 406.8 219.168
+C 405.959837 219.168 405.153971 218.8342 404.559886 218.240114
+C 403.9658 217.646029 403.632 216.840163 403.632 216
+C 403.632 215.159837 403.9658 214.353971 404.559886 213.759886
+C 405.153971 213.1658 405.959837 212.832 406.8 212.832
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 511.2 212.4
+C 512.154731 212.4 513.070488 212.779319 513.745584 213.454416
+C 514.420681 214.129512 514.8 215.045269 514.8 216
+C 514.8 216.954731 514.420681 217.870488 513.745584 218.545584
+C 513.070488 219.220681 512.154731 219.6 511.2 219.6
+C 510.245269 219.6 509.329512 219.220681 508.654416 218.545584
+C 507.979319 217.870488 507.6 216.954731 507.6 216
+C 507.6 215.045269 507.979319 214.129512 508.654416 213.454416
+C 509.329512 212.779319 510.245269 212.4 511.2 212.4
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 286.56 227.52
+L 303.84 227.52
+L 303.84 285.12
+L 286.56 285.12
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 295.2 293.472
+C 296.040163 293.472 296.846029 293.8058 297.440114 294.399886
+C 298.0342 294.993971 298.368 295.799837 298.368 296.64
+C 298.368 297.480163 298.0342 298.286029 297.440114 298.880114
+C 296.846029 299.4742 296.040163 299.808 295.2 299.808
+C 294.359837 299.808 293.553971 299.4742 292.959886 298.880114
+C 292.3658 298.286029 292.032 297.480163 292.032 296.64
+C 292.032 295.799837 292.3658 294.993971 292.959886 294.399886
+C 293.553971 293.8058 294.359837 293.472 295.2 293.472
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 61.2 293.04
+C 62.154731 293.04 63.070488 293.419319 63.745584 294.094416
+C 64.420681 294.769512 64.8 295.685269 64.8 296.64
+C 64.8 297.594731 64.420681 298.510488 63.745584 299.185584
+C 63.070488 299.860681 62.154731 300.24 61.2 300.24
+C 60.245269 300.24 59.329512 299.860681 58.654416 299.185584
+C 57.979319 298.510488 57.6 297.594731 57.6 296.64
+C 57.6 295.685269 57.979319 294.769512 58.654416 294.094416
+C 59.329512 293.419319 60.245269 293.04 61.2 293.04
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 540 162
+L 943.2 162
+L 943.2 329.04
+L 540 329.04
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke-dasharray: 7.5,6; stroke-dashoffset: 0; stroke: #526672; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 586.8 207.36
+L 648 207.36
+L 648 224.64
+L 586.8 224.64
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 741.6 212.832
+C 742.440163 212.832 743.246029 213.1658 743.840114 213.759886
+C 744.4342 214.353971 744.768 215.159837 744.768 216
+C 744.768 216.840163 744.4342 217.646029 743.840114 218.240114
+C 743.246029 218.8342 742.440163 219.168 741.6 219.168
+C 740.759837 219.168 739.953971 218.8342 739.359886 218.240114
+C 738.7658 217.646029 738.432 216.840163 738.432 216
+C 738.432 215.159837 738.7658 214.353971 739.359886 213.759886
+C 739.953971 213.1658 740.759837 212.832 741.6 212.832
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 882 212.4
+C 882.954731 212.4 883.870488 212.779319 884.545584 213.454416
+C 885.220681 214.129512 885.6 215.045269 885.6 216
+C 885.6 216.954731 885.220681 217.870488 884.545584 218.545584
+C 883.870488 219.220681 882.954731 219.6 882 219.6
+C 881.045269 219.6 880.129512 219.220681 879.454416 218.545584
+C 878.779319 217.870488 878.4 216.954731 878.4 216
+C 878.4 215.045269 878.779319 214.129512 879.454416 213.454416
+C 880.129512 212.779319 881.045269 212.4 882 212.4
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 732.96 227.52
+L 750.24 227.52
+L 750.24 285.12
+L 732.96 285.12
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 38.88 457.2
+L 969.12 457.2
+Q 979.2 457.2 979.2 467.28
+L 979.2 706.32
+Q 979.2 716.4 969.12 716.4
+L 38.88 716.4
+Q 28.8 716.4 28.8 706.32
+L 28.8 467.28
+Q 28.8 457.2 38.88 457.2
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #f3f7f9; stroke: #d3e0e6; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 61.2 568.8
+C 62.154731 568.8 63.070488 569.179319 63.745584 569.854416
+C 64.420681 570.529512 64.8 571.445269 64.8 572.4
+C 64.8 573.354731 64.420681 574.270488 63.745584 574.945584
+C 63.070488 575.620681 62.154731 576 61.2 576
+C 60.245269 576 59.329512 575.620681 58.654416 574.945584
+C 57.979319 574.270488 57.6 573.354731 57.6 572.4
+C 57.6 571.445269 57.979319 570.529512 58.654416 569.854416
+C 59.329512 569.179319 60.245269 568.8 61.2 568.8
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 162 563.76
+L 226.8 563.76
+L 226.8 581.04
+L 162 581.04
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 295.2 569.232
+C 296.040163 569.232 296.846029 569.5658 297.440114 570.159886
+C 298.0342 570.753971 298.368 571.559837 298.368 572.4
+C 298.368 573.240163 298.0342 574.046029 297.440114 574.640114
+C 296.846029 575.2342 296.040163 575.568 295.2 575.568
+C 294.359837 575.568 293.553971 575.2342 292.959886 574.640114
+C 292.3658 574.046029 292.032 573.240163 292.032 572.4
+C 292.032 571.559837 292.3658 570.753971 292.959886 570.159886
+C 293.553971 569.5658 294.359837 569.232 295.2 569.232
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 406.8 569.232
+C 407.640163 569.232 408.446029 569.5658 409.040114 570.159886
+C 409.6342 570.753971 409.968 571.559837 409.968 572.4
+C 409.968 573.240163 409.6342 574.046029 409.040114 574.640114
+C 408.446029 575.2342 407.640163 575.568 406.8 575.568
+C 405.959837 575.568 405.153971 575.2342 404.559886 574.640114
+C 403.9658 574.046029 403.632 573.240163 403.632 572.4
+C 403.632 571.559837 403.9658 570.753971 404.559886 570.159886
+C 405.153971 569.5658 405.959837 569.232 406.8 569.232
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 286.56 583.92
+L 303.84 583.92
+L 303.84 640.08
+L 286.56 640.08
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 295.2 648.432
+C 296.040163 648.432 296.846029 648.7658 297.440114 649.359886
+C 298.0342 649.953971 298.368 650.759837 298.368 651.6
+C 298.368 652.440163 298.0342 653.246029 297.440114 653.840114
+C 296.846029 654.4342 296.040163 654.768 295.2 654.768
+C 294.359837 654.768 293.553971 654.4342 292.959886 653.840114
+C 292.3658 653.246029 292.032 652.440163 292.032 651.6
+C 292.032 650.759837 292.3658 649.953971 292.959886 649.359886
+C 293.553971 648.7658 294.359837 648.432 295.2 648.432
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #147b75; stroke: #147b75; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 61.2 648
+C 62.154731 648 63.070488 648.379319 63.745584 649.054416
+C 64.420681 649.729512 64.8 650.645269 64.8 651.6
+C 64.8 652.554731 64.420681 653.470488 63.745584 654.145584
+C 63.070488 654.820681 62.154731 655.2 61.2 655.2
+C 60.245269 655.2 59.329512 654.820681 58.654416 654.145584
+C 57.979319 653.470488 57.6 652.554731 57.6 651.6
+C 57.6 650.645269 57.979319 649.729512 58.654416 649.054416
+C 59.329512 648.379319 60.245269 648 61.2 648
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_24">
+    <path d="M 547.2 568.8
+C 548.154731 568.8 549.070488 569.179319 549.745584 569.854416
+C 550.420681 570.529512 550.8 571.445269 550.8 572.4
+C 550.8 573.354731 550.420681 574.270488 549.745584 574.945584
+C 549.070488 575.620681 548.154731 576 547.2 576
+C 546.245269 576 545.329512 575.620681 544.654416 574.945584
+C 543.979319 574.270488 543.6 573.354731 543.6 572.4
+C 543.6 571.445269 543.979319 570.529512 544.654416 569.854416
+C 545.329512 569.179319 546.245269 568.8 547.2 568.8
+z
+" clip-path="url(#p398dcc3d37)" style="fill: #ffffff; stroke: #147b75; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 64.8 216
+L 147.6 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 147.6 216
+L 162 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 226.8 216
+L 241.2 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 241.2 216
+L 511.2 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 295.2 216
+L 295.2 227.52
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 295.2 285.12
+L 295.2 296.64
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 406.8 216
+L 406.8 252.72
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 393.84 252.72
+L 419.76 252.72
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 393.84 259.92
+L 419.76 259.92
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 406.8 259.92
+L 406.8 296.64
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 295.2 296.64
+L 406.8 296.64
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 295.2 296.64
+L 295.2 303.84
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 283.68 303.84
+L 306.72 303.84
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 287.28 309.6
+L 303.12 309.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_15">
+    <path d="M 291.6 315.36
+L 298.8 315.36
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_16">
+    <path d="M 64.8 296.64
+L 129.6 296.64
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_17">
+    <path d="M 129.6 296.64
+L 129.6 303.84
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_18">
+    <path d="M 118.08 303.84
+L 141.12 303.84
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_19">
+    <path d="M 121.68 309.6
+L 137.52 309.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_20">
+    <path d="M 126 315.36
+L 133.2 315.36
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_21">
+    <path d="M 514.8 216
+L 572.4 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_22">
+    <path d="M 572.4 216
+L 586.8 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_23">
+    <path d="M 648 216
+L 662.4 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_24">
+    <path d="M 662.4 216
+L 882 216
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_25">
+    <path d="M 741.6 216
+L 741.6 227.52
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_26">
+    <path d="M 741.6 285.12
+L 741.6 296.64
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_27">
+    <path d="M 741.6 296.64
+L 741.6 303.84
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_28">
+    <path d="M 730.08 303.84
+L 753.12 303.84
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_29">
+    <path d="M 733.68 309.6
+L 749.52 309.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_30">
+    <path d="M 738 315.36
+L 745.2 315.36
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_31">
+    <path d="M 64.8 572.4
+L 147.6 572.4
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_32">
+    <path d="M 147.6 572.4
+L 162 572.4
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_33">
+    <path d="M 226.8 572.4
+L 241.2 572.4
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_34">
+    <path d="M 241.2 572.4
+L 547.2 572.4
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_35">
+    <path d="M 295.2 572.4
+L 295.2 583.92
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_36">
+    <path d="M 295.2 640.08
+L 295.2 651.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_37">
+    <path d="M 406.8 572.4
+L 406.8 608.4
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_38">
+    <path d="M 393.84 608.4
+L 419.76 608.4
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_39">
+    <path d="M 393.84 615.6
+L 419.76 615.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_40">
+    <path d="M 406.8 615.6
+L 406.8 651.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_41">
+    <path d="M 295.2 651.6
+L 406.8 651.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_42">
+    <path d="M 295.2 651.6
+L 295.2 658.8
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_43">
+    <path d="M 283.68 658.8
+L 306.72 658.8
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_44">
+    <path d="M 287.28 664.56
+L 303.12 664.56
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_45">
+    <path d="M 291.6 670.32
+L 298.8 670.32
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_46">
+    <path d="M 64.8 651.6
+L 129.6 651.6
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_47">
+    <path d="M 129.6 651.6
+L 129.6 658.8
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_48">
+    <path d="M 118.08 658.8
+L 141.12 658.8
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_49">
+    <path d="M 121.68 664.56
+L 137.52 664.56
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_50">
+    <path d="M 126 670.32
+L 133.2 670.32
+" clip-path="url(#p398dcc3d37)" style="fill: none; stroke: #147b75; stroke-width: 2.3; stroke-linecap: round"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 26px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="36" y="45.038906" transform="rotate(-0 36 45.038906)">UPS Controller · вимірювання батареї 12 В</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="36" y="74.826797" transform="rotate(-0 36 74.826797)">Робочий проєктний діапазон батареї: 0…16 В; очікувана зарядна напруга до 14,4 В.</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1459a1" x="46.08" y="130.246875" transform="rotate(-0 46.08 130.246875)">ESP8266 · зовнішній дільник 180 кОм / 10 кОм</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="46.08" y="151.733438" transform="rotate(-0 46.08 151.733438)">Цей зовнішній дільник застосовується також до плати без вбудованого дільника A0.</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="61.2" y="189.851719" transform="rotate(-0 61.2 189.851719)">+ батареї</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #147b75" x="194.4" y="197.267188" transform="rotate(-0 194.4 197.267188)">R13  180 кОм</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526672" x="194.4" y="245.768984" transform="rotate(-0 194.4 245.768984)">біля батареї</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #1459a1" x="504" y="196.930938" transform="rotate(-0 504 196.930938)">A0</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #147b75" x="278.64" y="250.99125" transform="rotate(-0 278.64 250.99125)">R14</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #147b75" x="278.64" y="268.547188" transform="rotate(-0 278.64 268.547188)">10 кОм</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #147b75" x="424.8" y="250.99125" transform="rotate(-0 424.8 250.99125)">C7</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #147b75" x="424.8" y="268.547188" transform="rotate(-0 424.8 268.547188)">100 нФ</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="313.92" y="311.47125" transform="rotate(-0 313.92 311.47125)">GND</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="148.32" y="311.47125" transform="rotate(-0 148.32 311.47125)">GND</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="61.2" y="278.839453" transform="rotate(-0 61.2 278.839453)">− батареї</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1459a1" x="64.8" y="355.828672" transform="rotate(-0 64.8 355.828672)">Без вбудованого дільника: A0 ≈ 0,758 В при 14,4 В</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="64.8" y="382.307188" transform="rotate(-0 64.8 382.307188)">Без дільника на платі: коефіцієнт 19000 мВ.</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="64.8" y="407.617891" transform="rotate(-0 64.8 407.617891)">Зі вбудованими 220 кОм / 100 кОм: 62600 мВ.</text>
+   </g>
+   <g id="text_19">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="558" y="182.59125" transform="rotate(-0 558 182.59125)">ВЖЕ НА ПЛАТІ, ЯКЩО ВСТАНОВЛЕНО</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #147b75" x="617.4" y="197.267188" transform="rotate(-0 617.4 197.267188)">Rint1  220 кОм</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #1459a1" x="905.76" y="199.15125" transform="rotate(-0 905.76 199.15125)">TOUT · ADC 0…1 В</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #147b75" x="758.16" y="250.99125" transform="rotate(-0 758.16 250.99125)">Rint2</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #147b75" x="758.16" y="268.547188" transform="rotate(-0 758.16 268.547188)">100 кОм</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="554.4" y="355.667188" transform="rotate(-0 554.4 355.667188)">Це модель штатного дільника NodeMCU.</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="554.4" y="382.307188" transform="rotate(-0 554.4 382.307188)">Rint1 / Rint2 не додавати до монтажу.</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="554.4" y="407.507188" transform="rotate(-0 554.4 407.507188)">A0 ≈ 0,736 В; TOUT ≈ 0,230 В при 14,4 В.</text>
+   </g>
+   <g id="text_27">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1459a1" x="46.08" y="486.646875" transform="rotate(-0 46.08 486.646875)">Arduino Nano · зовнішній дільник 33 кОм / 10 кОм</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="46.08" y="508.03125" transform="rotate(-0 46.08 508.03125)">Для Nano ATmega328P із живленням 5 В та analogReference(DEFAULT).</text>
+   </g>
+   <g id="text_29">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="61.2" y="546.251719" transform="rotate(-0 61.2 546.251719)">+ батареї</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #147b75" x="194.4" y="553.667188" transform="rotate(-0 194.4 553.667188)">R15  33 кОм</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526672" x="194.4" y="602.168984" transform="rotate(-0 194.4 602.168984)">біля батареї</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #147b75" x="278.64" y="606.67125" transform="rotate(-0 278.64 606.67125)">R16</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #147b75" x="278.64" y="624.227188" transform="rotate(-0 278.64 624.227188)">10 кОм</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #147b75" x="424.8" y="606.67125" transform="rotate(-0 424.8 606.67125)">C8</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #147b75" x="424.8" y="624.227188" transform="rotate(-0 424.8 624.227188)">100 нФ</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="313.92" y="666.43125" transform="rotate(-0 313.92 666.43125)">GND</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="148.32" y="666.43125" transform="rotate(-0 148.32 666.43125)">GND</text>
+   </g>
+   <g id="text_38">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="61.2" y="633.799453" transform="rotate(-0 61.2 633.799453)">− батареї</text>
+   </g>
+   <g id="text_39">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #1459a1" x="547.2" y="553.330938" transform="rotate(-0 547.2 553.330938)">A0</text>
+   </g>
+   <g id="text_40">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="601.2" y="571.743984" transform="rotate(-0 601.2 571.743984)">При 14,4 В на батареї:</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="601.2" y="597.587188" transform="rotate(-0 601.2 597.587188)">A0 ≈ 3,349 В; струм дільника ≈ 0,335 мА.</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="601.2" y="627.827188" transform="rotate(-0 601.2 627.827188)">При AVCC = 5,000 В: коефіцієнт 21500 мВ.</text>
+   </g>
+   <g id="text_43">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #87520e" x="601.2" y="658.897891" transform="rotate(-0 601.2 658.897891)">Опора — AVCC. Не вибирати INTERNAL 1,1 В.</text>
+   </g>
+   <g id="text_44">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #87520e" x="64.8" y="702.097891" transform="rotate(-0 64.8 702.097891)">Мінус батареї = GND контролера, тільки якщо таке з’єднання перевірене та допустиме.</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #153043" x="36" y="748.897891" transform="rotate(-0 36 748.897891)">Усі резистори ±1%, 0,125 Вт або більше. C7/C8 — 100 нФ X7R, ≥16 В, біля A0 та GND плати.</text>
+   </g>
+   <g id="text_46">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #87520e" x="36" y="776.308672" transform="rotate(-0 36 776.308672)">Коефіцієнти 62600 / 19000 / 21500 мВ — масштаб перерахунку ADC, не допустима напруга батареї.</text>
+   </g>
+   <g id="text_47">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #87520e" x="36" y="803.617891" transform="rotate(-0 36 803.617891)">Не підключати 12–14,4 В безпосередньо до A0, GPIO, 3V3 чи USB/VIN. Подільник не забезпечує розв’язку.</text>
+   </g>
+   <g id="text_48">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526672" x="36" y="830.977891" transform="rotate(-0 36 830.977891)">Калібрувати за мультиметром. Від’єднувати сигнали й батарейний вхід перед знеструмленням контролера.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p398dcc3d37">
+   <rect x="0" y="0" width="1008" height="856.8"/>
+  </clipPath>
+ </defs>
+</svg>

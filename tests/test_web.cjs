@@ -28,13 +28,18 @@ async function launchBrowser() {
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     const status = {
-      version: '1.0.0', csrf_token: 'initial-token', uptime_ms: 125000,
+      version: '1.1.0', csrf_token: 'initial-token', uptime_ms: 125000,
       free_heap: 29400, reset_reason: 'Power on', storage_ok: true,
       ups: {
         state: 'off', phase: 'finished', result: 'none', busy: false,
         relay: false, mains: true, online: false, battery: false,
         inputs_valid: true, auto_hold: false, cycle_handled: false,
         attempts: 0, remaining_ms: 0
+      },
+      battery: {
+        enabled: false, valid: false, raw_adc: null, voltage_mv: null,
+        low: false, saturated: false, state: 'disabled',
+        full_scale_mv: 62600, low_warning_mv: 0
       },
       network: {
         mode: 'standalone', ap_active: true, ap_ssid: 'UPS_wifi',
@@ -57,6 +62,7 @@ async function launchBrowser() {
         auto_on_boot: true, allow_battery_start: false
       },
       inputs: { online_active_high: true, battery_active_high: true, standby_active_high: true },
+      battery: { enabled: false, full_scale_mv: 62600, low_warning_mv: 0 },
       security: { username: 'admin' }
     };
     const writes = [], errors = [];
@@ -88,6 +94,10 @@ async function launchBrowser() {
       if (pathname === '/api/config' && request.method() === 'GET') data = config;
       if (pathname === '/api/config' && request.method() === 'POST') {
         for (const key of Object.keys(body)) config[key] = { ...config[key], ...body[key] };
+        if (body.battery) Object.assign(status.battery, body.battery, {
+          valid: false, raw_adc: null, voltage_mv: null, low: false,
+          saturated: false, state: body.battery.enabled ? 'warming_up' : 'disabled'
+        });
         if (body.network) {
           status.network.mode = body.network.mode;
           if (Object.hasOwn(body.network, 'password')) {
@@ -95,6 +105,13 @@ async function launchBrowser() {
             delete config.network.password;
           }
         }
+      }
+      if (pathname === '/api/battery/calibrate') {
+        config.battery.full_scale_mv = Math.round(body.reference_mv * 1023 / status.battery.raw_adc);
+        Object.assign(status.battery, {
+          full_scale_mv: config.battery.full_scale_mv, valid: false,
+          raw_adc: null, voltage_mv: null, low: false, state: 'warming_up'
+        });
       }
       if (pathname === '/api/logs') data = { events: [
         { id: 1, uptime_ms: 5000, level: 'info', message: '<img src=x onerror="window.injected=true">' },
@@ -111,7 +128,7 @@ async function launchBrowser() {
         { ssid: 'Open', rssi: -70, secure: false }
       ] };
       if (pathname === '/api/update') {
-        status.version = '1.0.1'; status.csrf_token = 'after-update'; status.uptime_ms = 500;
+        status.version = '1.1.1'; status.csrf_token = 'after-update'; status.uptime_ms = 500;
       }
       return reply(data);
     });
@@ -119,6 +136,9 @@ async function launchBrowser() {
     await page.waitForFunction(() => document.querySelector('#connection_text').textContent === 'На зв’язку' && !document.querySelector('[data-action=start]').disabled);
     assert.equal(await page.locator('#log_list img').count(), 0);
     assert.equal(await page.evaluate(() => window.injected), undefined);
+    assert.equal(await page.locator('#battery_voltage').textContent(), '—');
+    assert.equal(await page.locator('#battery_state_badge').textContent(), 'Вимкнено');
+    assert.equal(await page.locator('#battery_calibrate_button').isDisabled(), true);
     if (screenshots) await page.screenshot({ path: path.join(screenshots, 'desktop.png'), fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     for (const tab of ['overview', 'automation', 'network', 'system']) {
@@ -157,7 +177,7 @@ async function launchBrowser() {
     assert.match(await page.locator('#feedback_text').textContent(), /має бути довшим/);
     assert.equal(writes.length, beforeInvalid);
     await page.locator('#verify_timeout_ms').fill('15');
-    await page.locator('details').evaluate(element => { element.open = true; });
+    await page.locator('#automation_form details').evaluate(element => { element.open = true; });
     await page.locator('#online_active_high').selectOption('false');
     await page.locator('#automation_form button[type=submit]').click();
     assert.match(await page.locator('#feedback_text').textContent(), /Для зміни полярності/);
@@ -168,6 +188,106 @@ async function launchBrowser() {
     await page.locator('#automation_form button[type=submit]').click();
     await page.waitForFunction(() => document.querySelector('#feedback_text').textContent === 'Не вдалося записати налаштування');
     assert.equal(config.ups.start_delay_ms, 23500, 'Failed save must not be presented as committed');
+
+    // Battery settings are independent from digital BATTERY and preserve edits
+    // in the automation form, including after calibration refreshes config.
+    await page.locator('#tab_system').click();
+    await page.locator('#battery_enabled').check();
+    await page.locator('#battery_warning_enabled').check();
+    await page.locator('#battery_low_warning').fill('11.6');
+    await page.locator('#battery_advanced').evaluate(element => { element.open = true; });
+    await page.locator('#battery_preset').selectOption('19000');
+    assert.equal(await page.locator('#battery_full_scale').inputValue(), '19');
+    await page.locator('#battery_preset').selectOption('62600');
+    assert.equal(await page.locator('#battery_full_scale').inputValue(), '62.6');
+    await page.locator('#battery_full_scale').fill('63.1');
+    assert.equal(await page.locator('#battery_preset').inputValue(), 'custom');
+    await page.waitForTimeout(2200);
+    assert.equal(await page.locator('#battery_full_scale').inputValue(), '63.1', 'Polling preserves unsaved battery scale');
+    assert.equal(await page.locator('#battery_calibrate_button').isDisabled(), true, 'Unsaved settings block calibration');
+    await page.locator('#battery_form button[type=submit]').click();
+    await page.waitForFunction(() => !document.querySelector('#battery_form button[type=submit]').disabled);
+    assert.deepEqual(writes.filter(x => x.path === '/api/config').at(-1).body, {
+      battery: { enabled: true, full_scale_mv: 63100, low_warning_mv: 11600 }
+    });
+    assert.equal(await page.locator('#battery_voltage').textContent(), '—', 'Warm-up must not display null as zero volts');
+    assert.equal(await page.locator('#battery_adc').textContent(), '—');
+    assert.equal(await page.locator('#start_delay_ms').inputValue(), '24', 'Battery refresh preserves unrelated edits');
+    Object.assign(status.battery, { valid: true, raw_adc: 206, voltage_mv: 12707, state: 'ok' });
+    await page.evaluate(data => renderStatus(data), status);
+    assert.equal(await page.locator('#battery_voltage').textContent(), '12,7 В');
+    assert.equal(await page.locator('#battery_adc').textContent(), '206 / 1023');
+    assert.equal(await page.locator('#battery_calibrate_button').isDisabled(), false);
+    assert.equal(await page.locator('#battery_value').textContent(), 'Немає сигналу', 'Analog measurement does not alter digital BATTERY state');
+    assert.doesNotMatch(await page.locator('#battery_card').textContent(), /%/);
+    const validBattery = { ...status.battery };
+    for (const fault of [
+      { valid: false, raw_adc: 0, voltage_mv: null, state: 'no_signal', saturated: false },
+      { valid: false, raw_adc: 1023, voltage_mv: null, state: 'overrange', saturated: true },
+      { valid: false, raw_adc: null, voltage_mv: null, state: 'stale', saturated: false }
+    ]) {
+      Object.assign(status.battery, fault);
+      await page.evaluate(data => renderStatus(data), status);
+      assert.equal(await page.locator('#battery_voltage').textContent(), '—', fault.state + ' hides unreliable voltage');
+      assert.equal(await page.locator('#battery_calibrate_button').isDisabled(), true);
+    }
+    Object.assign(status.battery, validBattery, { raw_adc: 180, voltage_mv: 11100, low: true });
+    await page.evaluate(data => renderStatus(data), status);
+    assert.equal(await page.locator('#battery_voltage').textContent(), '11,1 В');
+    assert.equal(await page.locator('#battery_low_notice').isVisible(), false, 'Overview warning is inside the hidden overview tab');
+    assert.equal(await page.locator('#battery_low_notice').getAttribute('hidden'), null);
+    assert.match(await page.locator('#battery_low_notice').textContent(), /не вимикає UPS/);
+    Object.assign(status.battery, validBattery);
+    await page.evaluate(data => renderStatus(data), status);
+    assert.notEqual(await page.locator('#battery_low_notice').getAttribute('hidden'), null);
+    status.ups.busy = true;
+    await page.evaluate(data => renderStatus(data), status);
+    assert.equal(await page.locator('#battery_calibrate_button').isDisabled(), true);
+    status.ups.busy = false;
+    await page.evaluate(data => renderStatus(data), status);
+    await page.locator('#battery_reference').fill('12.65');
+    nextError = { path: '/api/battery/calibrate', status: 422, message: 'Масштаб поза межами' };
+    await page.locator('#battery_calibrate_button').click();
+    await page.waitForFunction(() => document.querySelector('#feedback_text').textContent === 'Масштаб поза межами');
+    assert.equal(config.battery.full_scale_mv, 63100, 'Failed calibration leaves saved scale intact');
+    await page.locator('#battery_calibrate_button').click();
+    await page.waitForFunction(() => !document.querySelector('#battery_form button[type=submit]').disabled);
+    assert.deepEqual(writes.filter(x => x.path === '/api/battery/calibrate').at(-1).body, { reference_mv: 12650 });
+    assert.equal(config.battery.full_scale_mv, Math.round(12650 * 1023 / 206));
+    assert.equal(await page.locator('#battery_full_scale').inputValue(), String(config.battery.full_scale_mv / 1000));
+    assert.equal(await page.locator('#start_delay_ms').inputValue(), '24');
+    assert.equal(await page.locator('#battery_calibrate_button').isDisabled(), true, 'Calibration restarts the averaging window');
+    const beforeInvalidBattery = writes.length;
+    await page.locator('#battery_low_warning').fill('7.5');
+    await page.locator('#battery_form button[type=submit]').click();
+    assert.equal(writes.length, beforeInvalidBattery, 'Out-of-range warning is not posted');
+    await page.locator('#battery_low_warning').fill('11.6');
+    await page.locator('#battery_enabled').uncheck();
+    await page.locator('#battery_form button[type=submit]').click();
+    await page.waitForFunction(() => !document.querySelector('#battery_form button[type=submit]').disabled);
+    assert.equal(config.battery.enabled, false);
+    assert.equal(await page.locator('#battery_voltage').textContent(), '—');
+    const legacyStatus = { ...status }; delete legacyStatus.battery;
+    await page.evaluate(data => renderStatus(data), legacyStatus);
+    assert.equal(await page.locator('#battery_state_badge').textContent(), 'Вимкнено', 'Older status responses degrade gracefully');
+    await page.evaluate(data => renderStatus(data), status);
+
+    if (screenshots) {
+      config.battery.enabled = true;
+      Object.assign(status.battery, validBattery, { enabled: true, voltage_mv: 12650 });
+      await page.evaluate(data => fillConfig(data, 'battery'), config);
+      await page.evaluate(data => renderStatus(data), status);
+      await page.locator('#tab_overview').click();
+      await page.screenshot({ path: path.join(screenshots, 'desktop-battery.png'), fullPage: true });
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.locator('#tab_system').click();
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'Mobile battery settings fit');
+      await page.screenshot({ path: path.join(screenshots, 'mobile-battery-settings.png'), fullPage: true });
+      await page.setViewportSize({ width: 1280, height: 900 });
+      config.battery.enabled = false;
+      Object.assign(status.battery, { enabled: false, valid: false, raw_adc: null, voltage_mv: null, state: 'disabled' });
+      await page.evaluate(data => fillConfig(data, 'battery'), config);
+    }
 
     await page.locator('#tab_network').click();
     await page.locator('#network_mode').selectOption('both');
@@ -202,9 +322,9 @@ async function launchBrowser() {
     await page.waitForFunction(() => document.querySelector('#feedback_text').textContent === 'Перевірка прошивки не пройдена');
     assert.equal(uploadReceived, true);
     assert.equal(await page.locator('#firmware_file').isDisabled(), false);
-    assert.equal(status.version, '1.0.0');
+    assert.equal(status.version, '1.1.0');
     await page.locator('#update_form button[type=submit]').click();
-    await page.waitForFunction(() => document.querySelector('#firmware_version').textContent === '1.0.1');
+    await page.waitForFunction(() => document.querySelector('#firmware_version').textContent === '1.1.1');
     await page.waitForFunction(() => document.querySelector('#feedback_text').textContent.includes('знову на зв’язку'));
 
     await page.locator('#tab_automation').click();
@@ -216,7 +336,7 @@ async function launchBrowser() {
     await page.waitForFunction(() => document.querySelector('#connection_text').textContent === 'На зв’язку');
     assert.equal(await page.locator('#start_delay_ms').inputValue(), '42.5');
     assert.deepEqual(errors, []);
-    console.log('Web smoke checks passed: responsive layout, commands/guards, token refresh, settings, validation/error handling, Wi-Fi secrets/scan, escaping, OTA failure/reconnect, offline recovery.');
+    console.log('Web smoke checks passed: responsive layout, commands/guards, token refresh, settings, battery readings/faults/calibration, validation/error handling, Wi-Fi secrets/scan, escaping, OTA failure/reconnect, offline recovery.');
   } finally {
     await browser.close();
   }

@@ -45,6 +45,11 @@ def main():
     print("Building and running controller tests", flush=True)
     subprocess.run(base + includes + [str(root / "tests/test_controller.cpp"), core, "-o", str(controller_binary)], check=True)
     subprocess.run([str(controller_binary)], cwd=root, check=True)
+    battery_binary = build / ("test_battery" + suffix)
+    battery = str(root / "libraries/UpsControl/src/BatteryMonitor.cpp")
+    print("Building and running battery measurement tests", flush=True)
+    subprocess.run(base + includes + [str(root / "tests/test_battery.cpp"), battery, "-o", str(battery_binary)], check=True)
+    subprocess.run([str(battery_binary)], cwd=root, check=True)
     if args.target == "nano":
         return
 
